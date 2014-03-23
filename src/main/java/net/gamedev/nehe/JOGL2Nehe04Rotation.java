@@ -86,6 +86,12 @@ public class JOGL2Nehe04Rotation extends GLCanvas implements GLEventListener {
     @Override
     public void init(GLAutoDrawable drawable) {
         GL2 gl = drawable.getGL().getGL2();      // get the OpenGL graphics context
+
+        System.out.println(String.format("GL Implementation: %s", gl.getGLProfile().getImplName()));
+        System.out.println(String.format("GL VENDOR:    %s", gl.glGetString(GL2.GL_VENDOR)));
+        System.out.println(String.format("GL RENDERER:  %s", gl.glGetString(GL2.GL_RENDERER)));
+        System.out.println(String.format("GL VERSION:   %s", gl.glGetString(GL2.GL_VERSION)));
+
         glu = new GLU();                         // get GL Utilities
         gl.glClearColor(0.0f, 0.0f, 0.0f, 0.0f); // set background (clear) color
         gl.glClearDepth(1.0f);      // set clear depth value to farthest
