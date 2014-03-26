@@ -1,9 +1,12 @@
 package jocl.fractal;
 
+import com.jogamp.newt.event.KeyListener;
+import com.jogamp.newt.event.KeyEvent;
+import com.jogamp.newt.event.MouseListener;
+import com.jogamp.newt.opengl.GLWindow;
 import com.jogamp.opencl.CLBuffer;
 import com.jogamp.opencl.CLCommandQueue;
 import com.jogamp.opencl.CLDevice;
-import com.jogamp.opencl.CLEvent;
 import com.jogamp.opencl.CLEventList;
 import com.jogamp.opencl.CLException;
 import com.jogamp.opencl.gl.CLGLBuffer;
@@ -13,20 +16,8 @@ import com.jogamp.opencl.CLPlatform;
 import com.jogamp.opencl.CLProgram;
 import com.jogamp.opencl.CLProgram.CompilerOptions;
 import com.jogamp.opencl.util.CLProgramConfiguration;
-import com.jogamp.opengl.util.awt.TextRenderer;
+import com.jogamp.opengl.util.FPSAnimator;
 import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.Frame;
-import java.awt.Point;
-import java.awt.Window;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseWheelEvent;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.IntBuffer;
@@ -40,14 +31,11 @@ import javax.media.opengl.GLCapabilities;
 import javax.media.opengl.GLContext;
 import javax.media.opengl.GLEventListener;
 import javax.media.opengl.GLProfile;
-import javax.media.opengl.awt.GLCanvas;
-import javax.swing.SwingUtilities;
 
 import static com.jogamp.common.nio.Buffers.*;
 import static javax.media.opengl.GL2.*;
 import static com.jogamp.opencl.CLMemory.Mem.*;
 import static com.jogamp.opencl.CLDevice.Type.*;
-import static com.jogamp.opencl.CLEvent.ProfilingCommand.*;
 import static com.jogamp.opencl.CLCommandQueue.Mode.*;
 import static java.lang.Math.*;
 
@@ -66,6 +54,8 @@ import static java.lang.Math.*;
  */
 public class MultiDeviceFractal implements GLEventListener {
 
+    private static final int FPS = 30;
+
     // max number of used GPUs
     private static final int MAX_PARRALLELISM_LEVEL = 8;
 
@@ -75,7 +65,7 @@ public class MultiDeviceFractal implements GLEventListener {
 
     private static final Logger _log = Logger.getLogger(MultiDeviceFractal.class.getName());
 
-    private GLCanvas canvas;
+    private static GLWindow window;
 
     private CLGLContext clContext;
     private CLCommandQueue[] queues;
@@ -100,31 +90,55 @@ public class MultiDeviceFractal implements GLEventListener {
     private boolean buffersInitialized;
     private boolean rebuild;
 
-    private final TextRenderer textRenderer;
+    //private final TextRenderer textRenderer;
 
-    public MultiDeviceFractal(int width, int height) {
-
+    public MultiDeviceFractal(final int width, final int height) {
         this.width = width;
         this.height = height;
+    }
 
-        canvas = new GLCanvas(new GLCapabilities(GLProfile.get(GLProfile.GL2)));
-        canvas.addGLEventListener(this);
-        initSceneInteraction();
+    public static void main(String args[]) {
+        MultiDeviceFractal multiDeviceFractal = new MultiDeviceFractal(1024, 800);
+        multiDeviceFractal.start();
+    }
 
-        Frame frame = new Frame("JOCL Multi Device Mandelbrot Set");
-        frame.addWindowListener(new WindowAdapter() {
+    public void start() {
+        GLCapabilities capabilities = new GLCapabilities(GLProfile.get(GLProfile.GL2));
+        window = GLWindow.create(capabilities);
+
+        // Create a animator that drives canvas' display() at the specified FPS.
+        final FPSAnimator animator = new FPSAnimator(window, FPS, true);
+
+        window.addWindowListener(new com.jogamp.newt.event.WindowAdapter() {
             @Override
-            public void windowClosing(WindowEvent e) {
-                MultiDeviceFractal.this.release(e.getWindow());
+            public void windowDestroyNotify(com.jogamp.newt.event.WindowEvent arg0) {
+                // Use a dedicate thread to run the stop() to ensure that the
+                // animator stops before program exits.
+                new Thread() {
+                    @Override
+                    public void run() {
+                        animator.stop(); // stop the animator loop
+                        System.exit(0);
+                    }
+                }.start();
             }
         });
-        canvas.setPreferredSize(new Dimension(width, height));
-        frame.add(canvas);
-        frame.pack();
 
-        frame.setVisible(true);
+        MouseListener mouseControls = new MouseEvents();
+        window.addMouseListener(mouseControls);
 
-        textRenderer = new TextRenderer(frame.getFont().deriveFont(Font.BOLD, 14), true, true, null, false);
+        KeyListener keyControls = new KeyEvents();
+        window.addKeyListener(keyControls);
+
+        window.addGLEventListener(this);
+
+        window.setSize(width, height);
+        window.setTitle("JOCL Multi Device Mandelbrot Set - NEWT version");
+        window.setVisible(true);
+
+        //textRenderer = new TextRenderer(window.getFont().deriveFont(Font.BOLD, 14), true, true, null, false);
+
+        animator.start();
     }
 
     @Override
@@ -371,7 +385,7 @@ public class MultiDeviceFractal implements GLEventListener {
     public void display(GLAutoDrawable drawable) {
         GL gl = drawable.getGL();
 
-        // make sure GL does not use our objects before we start computeing
+        // make sure GL does not use our objects before we start computing
         gl.glFinish();
         if(!buffersInitialized) {
             initPBO(gl);
@@ -384,6 +398,28 @@ public class MultiDeviceFractal implements GLEventListener {
         compute();
 
         render(gl.getGL2());
+    }
+
+    @Override
+    public void reshape(GLAutoDrawable drawable, int x, int y, int width, int height) {
+
+        if(this.width == width && this.height == height)
+            return;
+
+        this.width = width;
+        this.height = height;
+
+        initPBO(drawable.getGL());
+        setKernelConstants();
+
+        initView(drawable.getGL().getGL2(), width, height);
+    }
+
+    /**
+     * Called back before the OpenGL context is destroyed. Release resource such as buffers.
+     */
+    @Override
+    public void dispose(GLAutoDrawable drawable) {
     }
 
     // OpenCL
@@ -438,144 +474,125 @@ public class MultiDeviceFractal implements GLEventListener {
         }
         gl.glBindBuffer(GL_PIXEL_UNPACK_BUFFER, 0);
 
-        //draw info text
-        textRenderer.beginRendering(width, height, false);
-
-        textRenderer.draw("device/time/precision", 10, height-15);
-
-        for (int i = 0; i < slices; i++) {
-            CLDevice device = queues[i].getDevice();
-            boolean doubleFP = doublePrecision && isDoubleFPAvailable(device);
-            CLEvent event = probes.getEvent(i);
-            long start = event.getProfilingInfo(START);
-            long end = event.getProfilingInfo(END);
-            textRenderer.draw(device.getType().toString()+i +" "
-                    + (int)((end-start)/1000000.0f)+"ms @"
-                    + (doubleFP?"64bit":"32bit"), 10, height-(20+16*(slices-i)));
-        }
-
-        textRenderer.endRendering();
+        // todo: find a way to draw info to window without AWT
+//        textRenderer.beginRendering(width, height, false);
+//
+//        textRenderer.draw("device/time/precision", 10, height-15);
+//
+//        for (int i = 0; i < slices; i++) {
+//            CLDevice device = queues[i].getDevice();
+//            boolean doubleFP = doublePrecision && isDoubleFPAvailable(device);
+//            CLEvent event = probes.getEvent(i);
+//            long start = event.getProfilingInfo(START);
+//            long end = event.getProfilingInfo(END);
+//            textRenderer.draw(device.getType().toString()+i +" "
+//                    + (int)((end-start)/1000000.0f)+"ms @"
+//                    + (doubleFP?"64bit":"32bit"), 10, height-(20+16*(slices-i)));
+//        }
+//
+//        textRenderer.endRendering();
     }
-
-    @Override
-    public void reshape(GLAutoDrawable drawable, int x, int y, int width, int height) {
-
-        if(this.width == width && this.height == height)
-            return;
-
-        this.width = width;
-        this.height = height;
-
-        initPBO(drawable.getGL());
-        setKernelConstants();
-
-        initView(drawable.getGL().getGL2(), width, height);
-
-    }
-
-    private void initSceneInteraction() {
-
-        MouseAdapter mouseAdapter = new MouseAdapter() {
-
-            Point lastpos = new Point();
-
-            @Override
-            public void mouseDragged(MouseEvent e) {
-
-                double offsetX = (lastpos.x - e.getX()) * (maxX - minX) / width;
-                double offsetY = (lastpos.y - e.getY()) * (maxY - minY) / height;
-
-                minX += offsetX;
-                minY -= offsetY;
-
-                maxX += offsetX;
-                maxY -= offsetY;
-
-                lastpos = e.getPoint();
-
-                canvas.display();
-
-            }
-
-            @Override
-            public void mouseMoved(MouseEvent e) {
-                lastpos = e.getPoint();
-            }
-
-            @Override
-            public void mouseWheelMoved(MouseWheelEvent e) {
-                float rotation = e.getWheelRotation() / 25.0f;
-
-                double deltaX = rotation * (maxX - minX);
-                double deltaY = rotation * (maxY - minY);
-
-                // offset for "zoom to cursor"
-                double offsetX = (e.getX() / (float)width - 0.5f) * deltaX * 2;
-                double offsetY = (e.getY() / (float)height- 0.5f) * deltaY * 2;
-
-                minX += deltaX+offsetX;
-                minY += deltaY-offsetY;
-
-                maxX +=-deltaX+offsetX;
-                maxY +=-deltaY-offsetY;
-
-                canvas.display();
-            }
-        };
-
-        KeyAdapter keyAdapter = new KeyAdapter() {
-
-            @Override
-            public void keyPressed(KeyEvent e) {
-                if(e.getKeyCode() == KeyEvent.VK_SPACE) {
-                    drawSeperator = !drawSeperator;
-                }else if(e.getKeyChar() > '0' && e.getKeyChar() < '9') {
-                    int number = e.getKeyChar()-'0';
-                    slices = min(number, min(queues.length, MAX_PARRALLELISM_LEVEL));
-                    buffersInitialized = false;
-                }else if(e.getKeyCode() == KeyEvent.VK_D) {
-                    doublePrecision = !doublePrecision;
-                    rebuild = true;
-                }
-                canvas.display();
-            }
-
-        };
-
-        canvas.addMouseMotionListener(mouseAdapter);
-        canvas.addMouseWheelListener(mouseAdapter);
-        canvas.addKeyListener(keyAdapter);
-    }
-
 
     private boolean isDoubleFPAvailable(CLDevice device) {
         return device.isDoubleFPAvailable() || device.isExtensionAvailable("cl_amd_fp64");
     }
 
-    private void release(Window win) {
-        if(clContext != null) {
-            // releases all resources
-            clContext.release();
-        }
-        win.dispose();
-    }
+    class KeyEvents implements KeyListener {
+        @Override
+        public void keyPressed(KeyEvent e) {
+            short keyCode = e.getKeyCode();
 
-    /**
-     * Called back before the OpenGL context is destroyed. Release resource such as buffers.
-     */
-    @Override
-    public void dispose(GLAutoDrawable drawable) {
-    }
+            //_log.log(Level.ALL, "Key Pressed: %s", keyCode);
 
-    public static void main(String args[]) {
-
-        GLProfile.initSingleton();
-
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override public void run() {
-                new MultiDeviceFractal(1024, 800);
+            if(keyCode == KeyEvent.VK_SPACE) {
+                drawSeperator = !drawSeperator;
+            } else if(e.getKeyChar() > '0' && e.getKeyChar() < '9') {
+                int number = e.getKeyChar() - '0';
+                slices = min(number, min(queues.length, MAX_PARRALLELISM_LEVEL));
+                buffersInitialized = false;
+            } else if(keyCode == KeyEvent.VK_D) {
+                doublePrecision = !doublePrecision;
+                rebuild = true;
             }
-        });
+            window.display();
+        }
+
+        @Override
+        public void keyReleased(KeyEvent keyEvent) {
+
+        }
     }
 
+    class MouseEvents implements MouseListener {
+        int _x;
+        int _y;
+
+        @Override
+        public void mouseClicked(com.jogamp.newt.event.MouseEvent mouseEvent) {
+
+        }
+
+        @Override
+        public void mouseEntered(com.jogamp.newt.event.MouseEvent mouseEvent) {
+            _x = mouseEvent.getX();
+            _y = mouseEvent.getY();
+        }
+
+        @Override
+        public void mouseExited(com.jogamp.newt.event.MouseEvent mouseEvent) {
+
+        }
+
+        @Override
+        public void mousePressed(com.jogamp.newt.event.MouseEvent mouseEvent) {
+
+        }
+
+        @Override
+        public void mouseReleased(com.jogamp.newt.event.MouseEvent mouseEvent) {
+
+        }
+
+        @Override
+        public void mouseMoved(com.jogamp.newt.event.MouseEvent mouseEvent) {
+            _x = mouseEvent.getX();
+            _y = mouseEvent.getY();
+        }
+
+        @Override
+        public void mouseDragged(com.jogamp.newt.event.MouseEvent e) {
+            double offsetX = (_x - e.getX()) * (maxX - minX) / width;
+            double offsetY = (_y - e.getY()) * (maxY - minY) / height;
+
+            minX += offsetX;
+            minY -= offsetY;
+
+            maxX += offsetX;
+            maxY -= offsetY;
+
+            _x = e.getX();
+            _y = e.getY();
+        }
+
+        @Override
+        public void mouseWheelMoved(com.jogamp.newt.event.MouseEvent e) {
+            float[] rotationArray = e.getRotation(); // 3 values, 2nd is one we need
+            float rotation = rotationArray[1] / 25.0f;
+
+            double deltaX = rotation * (maxX - minX);
+            double deltaY = rotation * (maxY - minY);
+
+            // offset for "zoom to cursor"
+            double offsetX = (e.getX() / (float)width - 0.5f) * deltaX * 2;
+            double offsetY = (e.getY() / (float)height- 0.5f) * deltaY * 2;
+
+            minX += deltaX+offsetX;
+            minY += deltaY-offsetY;
+
+            maxX +=-deltaX+offsetX;
+            maxY +=-deltaY-offsetY;
+
+            window.display();
+        }
+    }
 }
