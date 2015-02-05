@@ -34,7 +34,7 @@ import static javax.media.opengl.fixedfunc.GLLightingFunc.GL_LIGHTING;
 import static javax.media.opengl.fixedfunc.GLLightingFunc.GL_POSITION;
 
 /**
- * NeHe Lesson #7 (JOGL 2 Port): Texture Filters, Lighting & Keyboard Inputs
+ * NeHe Lesson #7 (JOGL 2 Port): Texture Filters, Lighting &amp; Keyboard Inputs
  * @author Hock-Chuan Chua
  * @version May 2012
  *
@@ -53,7 +53,6 @@ public class JOGL2Nehe07TextureFilterLightKey extends GLCanvas implements GLEven
     private static final int CANVAS_HEIGHT = 480; // height of the drawable
     private static final int FPS = 60; // animator's target frames per second
 
-    /** The entry main() method to setup the top-level container and animator */
     public static void main(String[] args) {
         // Run the GUI codes in the event-dispatching thread for thread safety
         SwingUtilities.invokeLater(new Runnable() {
@@ -116,7 +115,7 @@ public class JOGL2Nehe07TextureFilterLightKey extends GLCanvas implements GLEven
     // Lighting
     private static boolean isLightOn;
 
-    /** Constructor to setup the GUI for this Component */
+    /* Constructor to setup the GUI for this Component */
     public JOGL2Nehe07TextureFilterLightKey() {
         this.addGLEventListener(this);
         // For handling KeyEvents
@@ -127,7 +126,7 @@ public class JOGL2Nehe07TextureFilterLightKey extends GLCanvas implements GLEven
 
     // ------ Implement methods declared in GLEventListener ------
 
-    /**
+    /*
      * Called back immediately after the OpenGL context is initialized. Can be used
      * to perform one-time initialization. Run only once.
      */
@@ -200,7 +199,7 @@ public class JOGL2Nehe07TextureFilterLightKey extends GLCanvas implements GLEven
         isLightOn = false;
     }
 
-    /**
+    /*
      * Call-back handler for window re-size event. Also called when the drawable is
      * first set to visible.
      */
@@ -224,7 +223,7 @@ public class JOGL2Nehe07TextureFilterLightKey extends GLCanvas implements GLEven
         gl.glLoadIdentity(); // reset
     }
 
-    /**
+    /*
      * Called back by the animator to perform rendering.
      */
     @Override
@@ -324,7 +323,7 @@ public class JOGL2Nehe07TextureFilterLightKey extends GLCanvas implements GLEven
         angleY += rotateSpeedY;
     }
 
-    /**
+    /*
      * Called back before the OpenGL context is destroyed. Release resource such as buffers.
      */
     @Override

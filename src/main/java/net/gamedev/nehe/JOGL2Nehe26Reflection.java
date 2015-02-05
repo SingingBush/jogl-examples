@@ -72,7 +72,6 @@ public class JOGL2Nehe26Reflection implements GLEventListener, KeyListener {
     private float[] lightDiffuseValue = { 1.0f, 1.0f, 1.0f, 1.0f }; // Diffuse light value in RGBA
     private float[] lightDiffusePosition = { 4.0f, 4.0f, 6.0f, 1.0f }; // Position of the light XYZ
 
-    /** The entry main() method */
     public static void main(String[] args) {
         // Create the OpenGL rendering canvas
         GLCanvas canvas = new GLCanvas();  // heavy-weight GLCanvas
@@ -112,7 +111,7 @@ public class JOGL2Nehe26Reflection implements GLEventListener, KeyListener {
 
     // ------ Implement methods declared in GLEventListener ------
 
-    /**
+    /*
      * Called back immediately after the OpenGL context is initialized. Can be used
      * to perform one-time initialization. Run only once.
      */
@@ -168,7 +167,7 @@ public class JOGL2Nehe26Reflection implements GLEventListener, KeyListener {
         gl.glTexGeni(GL_T, GL_TEXTURE_GEN_MODE, GL_SPHERE_MAP);
     }
 
-    /**
+    /*
      * Call-back handler for window re-size event. Also called when the drawable is
      * first set to visible.
      */
@@ -192,7 +191,7 @@ public class JOGL2Nehe26Reflection implements GLEventListener, KeyListener {
         gl.glLoadIdentity(); // reset
     }
 
-    /**
+    /*
      * Called back by the animator to perform rendering.
      */
     @Override
@@ -310,7 +309,7 @@ public class JOGL2Nehe26Reflection implements GLEventListener, KeyListener {
         gl.glEnd();
     }
 
-    /**
+    /*
      * Called back before the OpenGL context is destroyed. Release resource such as buffers.
      */
     @Override

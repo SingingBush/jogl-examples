@@ -26,7 +26,6 @@ public class JOGL2Nehe03Color extends GLCanvas implements GLEventListener {
     private static final int CANVAS_HEIGHT = 480; // height of the drawable
     private static final int FPS = 60; // animator's target frames per second
 
-    /** The entry main() method to setup the top-level container and animator */
     public static void main(String[] args) {
         // Run the GUI codes in the event-dispatching thread for thread safety
         SwingUtilities.invokeLater(new Runnable() {
@@ -68,14 +67,14 @@ public class JOGL2Nehe03Color extends GLCanvas implements GLEventListener {
 
     private GLU glu;  // for the GL Utility
 
-    /** Constructor to setup the GUI for this Component */
+    /* Constructor to setup the GUI for this Component */
     public JOGL2Nehe03Color() {
         this.addGLEventListener(this);
     }
 
     // ------ Implement methods declared in GLEventListener ------
 
-    /**
+    /*
      * Called back immediately after the OpenGL context is initialized. Can be used
      * to perform one-time initialization. Run only once.
      */
@@ -91,7 +90,7 @@ public class JOGL2Nehe03Color extends GLCanvas implements GLEventListener {
         gl.glShadeModel(GL_SMOOTH); // blends colors nicely, and smoothes out lighting
     }
 
-    /**
+    /*
      * Call-back handler for window re-size event. Also called when the drawable is
      * first set to visible.
      */
@@ -115,7 +114,7 @@ public class JOGL2Nehe03Color extends GLCanvas implements GLEventListener {
         gl.glLoadIdentity(); // reset
     }
 
-    /**
+    /*
      * Called back by the animator to perform rendering.
      */
     @Override
@@ -147,7 +146,7 @@ public class JOGL2Nehe03Color extends GLCanvas implements GLEventListener {
         gl.glEnd();
     }
 
-    /**
+    /*
      * Called back before the OpenGL context is destroyed. Release resource such as buffers.
      */
     @Override

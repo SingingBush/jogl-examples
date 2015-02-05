@@ -76,7 +76,7 @@ public class JOGL2Nehe10World3D implements GLEventListener, KeyListener {
 //   private float textureLeft;
 //   private float textureRight;
 
-    /** The entry main() method */
+
     public static void main(String[] args) {
         // Create the OpenGL rendering canvas
         GLCanvas canvas = new GLCanvas();  // heavy-weight GLCanvas
@@ -161,7 +161,7 @@ public class JOGL2Nehe10World3D implements GLEventListener, KeyListener {
 
     // ------ Implement methods declared in GLEventListener ------
 
-    /**
+    /*
      * Called back immediately after the OpenGL context is initialized. Can be used
      * to perform one-time initialization. Run only once.
      */
@@ -240,7 +240,7 @@ public class JOGL2Nehe10World3D implements GLEventListener, KeyListener {
         gl.glBlendFunc(GL_SRC_ALPHA, GL_ONE);
     }
 
-    /**
+    /*
      * Call-back handler for window re-size event. Also called when the drawable is
      * first set to visible.
      */
@@ -264,7 +264,7 @@ public class JOGL2Nehe10World3D implements GLEventListener, KeyListener {
         gl.glLoadIdentity(); // reset
     }
 
-    /**
+    /*
      * Called back by the animator to perform rendering.
      */
     @Override
@@ -327,7 +327,7 @@ public class JOGL2Nehe10World3D implements GLEventListener, KeyListener {
         }
     }
 
-    /**
+    /*
      * Called back before the OpenGL context is destroyed. Release resource such as buffers.
      */
     @Override

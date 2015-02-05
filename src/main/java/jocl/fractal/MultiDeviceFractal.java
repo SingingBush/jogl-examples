@@ -41,14 +41,14 @@ import static java.lang.Math.*;
 
 /**
  * Computes the Mandelbrot set with OpenCL using multiple GPUs and renders the result with OpenGL.
- * A shared PBO is used as storage for the fractal image.<br/>
+ * A shared PBO is used as storage for the fractal image.
  * http://en.wikipedia.org/wiki/Mandelbrot_set
  * <p>
- * controls:<br/>
- * keys 1-9 control parallelism level<br/>
- * space enables/disables slice seperator<br/>
- * 'd' toggles between 32/64bit floatingpoint precision<br/>
- * mouse/mousewheel to drag and zoom<br/>
+ * controls:
+ * keys 1-9 control parallelism level
+ * space enables/disables slice seperator
+ * 'd' toggles between 32/64bit floatingpoint precision
+ * mouse/mousewheel to drag and zoom
  * </p>
  * @author Michael Bien
  */
@@ -415,7 +415,7 @@ public class MultiDeviceFractal implements GLEventListener {
         initView(drawable.getGL().getGL2(), width, height);
     }
 
-    /**
+    /*
      * Called back before the OpenGL context is destroyed. Release resource such as buffers.
      */
     @Override

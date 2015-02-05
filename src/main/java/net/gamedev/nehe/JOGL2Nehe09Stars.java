@@ -63,7 +63,7 @@ public class JOGL2Nehe09Stars implements GLEventListener, KeyListener {
     // top, bottom, left and right coordinates.
     private float textureCoordTop, textureCoordBottom, textureCoordLeft, textureCoordRight;
 
-    /** The entry main() method */
+
     public static void main(String[] args) {
         // Create the OpenGL rendering canvas
         GLCanvas canvas = new GLCanvas();  // heavy-weight GLCanvas
@@ -104,7 +104,7 @@ public class JOGL2Nehe09Stars implements GLEventListener, KeyListener {
 
     // ------ Implement methods declared in GLEventListener ------
 
-    /**
+    /*
      * Called back immediately after the OpenGL context is initialized. Can be used
      * to perform one-time initialization. Run only once.
      */
@@ -163,7 +163,7 @@ public class JOGL2Nehe09Stars implements GLEventListener, KeyListener {
         }
     }
 
-    /**
+    /*
      * Call-back handler for window re-size event. Also called when the drawable is
      * first set to visible.
      */
@@ -187,7 +187,7 @@ public class JOGL2Nehe09Stars implements GLEventListener, KeyListener {
         gl.glLoadIdentity(); // reset
     }
 
-    /**
+    /*
      * Called back by the animator to perform rendering.
      */
     @Override
@@ -275,7 +275,7 @@ public class JOGL2Nehe09Stars implements GLEventListener, KeyListener {
         }
     }
 
-    /**
+    /*
      * Called back before the OpenGL context is destroyed. Release resource such as buffers.
      */
     @Override

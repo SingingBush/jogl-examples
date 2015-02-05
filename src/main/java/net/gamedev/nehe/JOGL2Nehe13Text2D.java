@@ -36,7 +36,7 @@ public class JOGL2Nehe13Text2D implements GLEventListener {  // Renderer
     private float counter1 = 0; // 1st Counter Used To Move Text & For Coloring
     private float counter2 = 0; // 2nd Counter Used To Move Text & For Coloring
 
-    /** The entry main() method */
+
     public static void main(String[] args) {
         // Create the OpenGL rendering canvas
         GLCanvas canvas = new GLCanvas();  // heavy-weight GLCanvas
@@ -71,7 +71,7 @@ public class JOGL2Nehe13Text2D implements GLEventListener {  // Renderer
 
     // ------ Implement methods declared in GLEventListener ------
 
-    /**
+    /*
      * Called back immediately after the OpenGL context is initialized. Can be used
      * to perform one-time initialization. Run only once.
      */
@@ -101,7 +101,7 @@ public class JOGL2Nehe13Text2D implements GLEventListener {  // Renderer
         textPosY = (drawable.getHeight() - textHeight) / 2 + textHeight;
     }
 
-    /**
+    /*
      * Call-back handler for window re-size event. Also called when the drawable is
      * first set to visible.
      */
@@ -125,7 +125,7 @@ public class JOGL2Nehe13Text2D implements GLEventListener {  // Renderer
         gl.glLoadIdentity(); // reset
     }
 
-    /**
+    /*
      * Called back by the animator to perform rendering.
      */
     @Override
@@ -159,7 +159,7 @@ public class JOGL2Nehe13Text2D implements GLEventListener {  // Renderer
         counter2 += 0.010f; // increase The Second Counter
     }
 
-    /**
+    /*
      * Called back before the OpenGL context is destroyed. Release resource such as buffers.
      */
     @Override

@@ -99,7 +99,7 @@ public class JOGL2Nehe15Fog implements GLEventListener, KeyListener {
     // Diffuse light location xyz (in front of the screen).
     private static float LightDiffusePosition[] = { 0.0f, 0.0f, 2.0f, 1.0f };
 
-    /** The entry main() method */
+
     public static void main(String[] args) {
         // Create the OpenGL rendering canvas
         GLCanvas canvas = new GLCanvas();  // heavy-weight GLCanvas
@@ -140,7 +140,7 @@ public class JOGL2Nehe15Fog implements GLEventListener, KeyListener {
 
     // ------ Implement methods declared in GLEventListener ------
 
-    /**
+    /*
      * Called back immediately after the OpenGL context is initialized. Can be used
      * to perform one-time initialization. Run only once.
      */
@@ -215,7 +215,7 @@ public class JOGL2Nehe15Fog implements GLEventListener, KeyListener {
         gl.glEnable(GL_LIGHT1);
     }
 
-    /**
+    /*
      * Call-back handler for window re-size event. Also called when the drawable is
      * first set to visible.
      */
@@ -239,7 +239,7 @@ public class JOGL2Nehe15Fog implements GLEventListener, KeyListener {
         gl.glLoadIdentity(); // reset
     }
 
-    /**
+    /*
      * Called back by the animator to perform rendering.
      */
     @Override
@@ -341,7 +341,7 @@ public class JOGL2Nehe15Fog implements GLEventListener, KeyListener {
         rotateAngleY += rotateSpeedY;
     }
 
-    /**
+    /*
      * Called back before the OpenGL context is destroyed. Release resource such as buffers.
      */
     @Override

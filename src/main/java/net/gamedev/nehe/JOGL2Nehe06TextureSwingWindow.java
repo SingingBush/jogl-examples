@@ -20,7 +20,6 @@ public class JOGL2Nehe06TextureSwingWindow extends GLCanvas {
     private static final int FPS = 60; // animator's target frames per second
 
 
-    /** The entry main() method to setup the top-level container and animator */
     public static void main(String[] args) {
         // Run the GUI codes in the event-dispatching thread for thread safety
         SwingUtilities.invokeLater(new Runnable() {
