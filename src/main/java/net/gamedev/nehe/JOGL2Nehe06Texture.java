@@ -1,16 +1,16 @@
 package net.gamedev.nehe;
 
 import java.io.IOException;
-import javax.media.opengl.GL2;
-import javax.media.opengl.GLAutoDrawable;
-import javax.media.opengl.GLEventListener;
-import javax.media.opengl.GLException;
-import javax.media.opengl.glu.GLU;
+import com.jogamp.opengl.GL2;
+import com.jogamp.opengl.GLAutoDrawable;
+import com.jogamp.opengl.GLEventListener;
+import com.jogamp.opengl.GLException;
+import com.jogamp.opengl.glu.GLU;
 import com.jogamp.opengl.util.texture.Texture;
 import com.jogamp.opengl.util.texture.TextureCoords;
 import com.jogamp.opengl.util.texture.TextureIO;
-import static javax.media.opengl.GL.*;  // GL constants
-import static javax.media.opengl.GL2.*; // GL2 constants
+import static com.jogamp.opengl.GL.*;  // GL constants
+import static com.jogamp.opengl.GL2.*; // GL2 constants
 
 /**
  * NeHe Lesson #6 (JOGL 2 Port): Texture

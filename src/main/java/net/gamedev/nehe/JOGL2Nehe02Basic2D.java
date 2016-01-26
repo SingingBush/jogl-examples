@@ -3,14 +3,14 @@ package net.gamedev.nehe;
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
-import javax.media.opengl.GL2;
-import javax.media.opengl.GLAutoDrawable;
-import javax.media.opengl.GLEventListener;
-import javax.media.opengl.awt.GLCanvas;
-import javax.media.opengl.glu.GLU;
+import com.jogamp.opengl.GL2;
+import com.jogamp.opengl.GLAutoDrawable;
+import com.jogamp.opengl.GLEventListener;
+import com.jogamp.opengl.awt.GLCanvas;
+import com.jogamp.opengl.glu.GLU;
 import com.jogamp.opengl.util.FPSAnimator;
-import static javax.media.opengl.GL.*;  // GL constants
-import static javax.media.opengl.GL2.*; // GL2 constants
+import static com.jogamp.opengl.GL.*;  // GL constants
+import static com.jogamp.opengl.GL2.*; // GL2 constants
 
 /**
  * NeHe Lesson #2 (JOGL 2 Port): Basic 2D Shapes

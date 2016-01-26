@@ -5,15 +5,15 @@ import java.awt.event.*;
 import java.awt.geom.Rectangle2D;
 import java.text.DecimalFormat;
 import javax.swing.*;
-import javax.media.opengl.GL2;
-import javax.media.opengl.GLAutoDrawable;
-import javax.media.opengl.GLEventListener;
-import javax.media.opengl.awt.GLCanvas;
-import javax.media.opengl.glu.GLU;
+import com.jogamp.opengl.GL2;
+import com.jogamp.opengl.GLAutoDrawable;
+import com.jogamp.opengl.GLEventListener;
+import com.jogamp.opengl.awt.GLCanvas;
+import com.jogamp.opengl.glu.GLU;
 import com.jogamp.opengl.util.FPSAnimator;
 import com.jogamp.opengl.util.awt.TextRenderer;
-import static javax.media.opengl.GL.*;  // GL constants
-import static javax.media.opengl.GL2.*; // GL2 constants
+import static com.jogamp.opengl.GL.*;  // GL constants
+import static com.jogamp.opengl.GL2.*; // GL2 constants
 
 /**
  * NeHe Lesson #13: 2D Text Rendering using TextRenderer class
@@ -97,8 +97,8 @@ public class JOGL2Nehe13Text2D implements GLEventListener {  // Renderer
         // 528 x 26
 
         // Centralize text on the canvas
-        textPosX = (drawable.getWidth() - textWidth) / 2;
-        textPosY = (drawable.getHeight() - textHeight) / 2 + textHeight;
+        textPosX = (drawable.getSurfaceWidth() - textWidth) / 2;
+        textPosY = (drawable.getSurfaceHeight() - textHeight) / 2 + textHeight;
     }
 
     /*
@@ -137,7 +137,7 @@ public class JOGL2Nehe13Text2D implements GLEventListener {  // Renderer
         // ----- Rendering 2D text using TextRenderer class -----
 
         // Prepare to draw text
-        textRenderer.beginRendering(drawable.getWidth(), drawable.getHeight());
+        textRenderer.beginRendering(drawable.getSurfaceWidth(), drawable.getSurfaceHeight());
 
         // Pulsing colors based on text position, set color in RGBA
         textRenderer.setColor((float)(Math.cos(counter1)),          // R

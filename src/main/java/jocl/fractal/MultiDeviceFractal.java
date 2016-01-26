@@ -23,17 +23,17 @@ import java.io.InputStream;
 import java.nio.IntBuffer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.media.opengl.DebugGL2;
-import javax.media.opengl.GL;
-import javax.media.opengl.GL2;
-import javax.media.opengl.GLAutoDrawable;
-import javax.media.opengl.GLCapabilities;
-import javax.media.opengl.GLContext;
-import javax.media.opengl.GLEventListener;
-import javax.media.opengl.GLProfile;
+import com.jogamp.opengl.DebugGL2;
+import com.jogamp.opengl.GL;
+import com.jogamp.opengl.GL2;
+import com.jogamp.opengl.GLAutoDrawable;
+import com.jogamp.opengl.GLCapabilities;
+import com.jogamp.opengl.GLContext;
+import com.jogamp.opengl.GLEventListener;
+import com.jogamp.opengl.GLProfile;
 
 import static com.jogamp.common.nio.Buffers.*;
-import static javax.media.opengl.GL2.*;
+import static com.jogamp.opengl.GL2.*;
 import static com.jogamp.opencl.CLMemory.Mem.*;
 import static com.jogamp.opencl.CLDevice.Type.*;
 import static com.jogamp.opencl.CLCommandQueue.Mode.*;
@@ -98,6 +98,11 @@ public class MultiDeviceFractal implements GLEventListener {
     }
 
     public static void main(String args[]) {
+        if(!CLPlatform.isAvailable()) {
+            System.out.println("OpenCL is not available");
+            System.exit(1);
+        }
+
         MultiDeviceFractal multiDeviceFractal = new MultiDeviceFractal(1024, 800);
         multiDeviceFractal.start();
     }
@@ -157,7 +162,7 @@ public class MultiDeviceFractal implements GLEventListener {
             gl.glDisable(GL_DEPTH_TEST);
             gl.glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
-            initView(gl, drawable.getWidth(), drawable.getHeight());
+            initView(gl, drawable.getSurfaceWidth(), drawable.getSurfaceHeight());
 
             initPBO(gl);
             drawable.getGL().glFinish();

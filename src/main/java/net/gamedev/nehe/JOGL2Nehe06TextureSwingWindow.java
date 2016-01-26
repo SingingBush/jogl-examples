@@ -2,7 +2,7 @@ package net.gamedev.nehe;
 
 import com.jogamp.opengl.util.FPSAnimator;
 
-import javax.media.opengl.awt.GLCanvas;
+import com.jogamp.opengl.awt.GLCanvas;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.WindowAdapter;
