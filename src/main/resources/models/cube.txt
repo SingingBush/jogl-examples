@@ -1,0 +1,43 @@
+// This cube model can be used with Nehe tutorial 6
+
+NUMPOLLIES 6
+
+// Front Face
+
+// should be in the format x y z u v
+
+-1.0 -1.0 1.0 0.0 0.0 // bottom-left of the texture and quad
+1.0 -1.0 1.0 1.0 0.0 // bottom-right of the texture and quad
+1.0 1.0 1.0 1.0 1.0  // top-right of the texture and quad
+-1.0 1.0 1.0 0.0 1.0 // top-left of the texture and quad
+
+// Back Face:
+-1.0 -1.0 -1.0 1.0 0.0
+-1.0 1.0 -1.0 1.0 1.0
+1.0 1.0 -1.0 0.0 1.0
+1.0 -1.0 -1.0 0.0 0.0
+
+
+// Top Face:
+-1.0 1.0 -1.0 0.0 1.0
+-1.0 1.0 1.0 0.0 0.0
+1.0 1.0 1.0 1.0 0.0
+1.0 1.0 -1.0 1.0 1.0
+
+// Bottom Face:
+-1.0 -1.0 -1.0 1.0 1.0
+1.0 -1.0 -1.0 0.0 1.0
+1.0 -1.0 1.0 0.0 0.0
+-1.0 -1.0 1.0 1.0 0.0
+
+// Right face:
+1.0 -1.0 -1.0 1.0 0.0
+1.0 1.0 -1.0 1.0 1.0
+1.0 1.0 1.0 0.0 1.0
+1.0 -1.0 1.0 0.0 0.0
+
+// Let Face:
+-1.0 -1.0 -1.0 0.0 0.0
+-1.0 -1.0 1.0 1.0 0.0
+-1.0 1.0 1.0 1.0 1.0
+-1.0 1.0 -1.0 0.0 1.0

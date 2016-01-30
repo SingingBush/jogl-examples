@@ -3,10 +3,8 @@ package net.gamedev.nehe;
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.image.BufferedImage;
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.util.Scanner;
+import java.net.URL;
 import javax.swing.*;
 import javax.imageio.ImageIO;
 import com.jogamp.opengl.GL2;
@@ -20,6 +18,10 @@ import com.jogamp.opengl.util.FPSAnimator;
 import com.jogamp.opengl.util.texture.Texture;
 import com.jogamp.opengl.util.texture.TextureCoords;
 import com.jogamp.opengl.util.texture.awt.AWTTextureIO;
+import com.singingbush.core.PolygonMesh;
+import com.singingbush.core.Triangle;
+import com.singingbush.loaders.SimpleModelLoader;
+
 import static java.awt.event.KeyEvent.VK_B;
 import static java.awt.event.KeyEvent.VK_DOWN;
 import static java.awt.event.KeyEvent.VK_LEFT;
@@ -47,8 +49,7 @@ public class JOGL2Nehe10World3D implements GLEventListener, KeyListener {
 
     private GLU glu;  // for the GL Utility
 
-    // The world
-    Sector sector;
+    private PolygonMesh<Triangle> worldMesh;
 
     private boolean blendingEnabled; // Blending ON/OFF
 
@@ -115,50 +116,6 @@ public class JOGL2Nehe10World3D implements GLEventListener, KeyListener {
         animator.start(); // start the animation loop
     }
 
-    private void setupWorld() throws IOException {
-        BufferedReader in = null;
-        try {
-            in = new BufferedReader(
-                    new InputStreamReader(this.getClass().getClassLoader().getResourceAsStream("models/world.txt")));
-
-            String line = null;
-            while ((line = in.readLine()) != null) {
-                if (line.trim().length() == 0 || line.trim().startsWith("//"))
-                    continue;
-                if (line.startsWith("NUMPOLLIES")) {
-                    int numTriangles;
-
-                    numTriangles = Integer.parseInt(
-                            line.substring(line.indexOf("NUMPOLLIES") + "NUMPOLLIES".length() + 1));
-                    sector = new Sector(numTriangles);
-                    break;
-                }
-            }
-
-            for (int i = 0; i < sector.triangles.length; i++) {
-                for (int vert = 0; vert < 3; vert++) {
-                    while ((line = in.readLine()) != null) {
-                        if (line.trim().length() == 0 || line.trim().startsWith("//"))
-                            continue;
-                        break;
-                    }
-                    if (line != null) {
-                        Scanner scanner = new Scanner(line);
-                        sector.triangles[i].vertices[vert].x = scanner.nextFloat();
-                        sector.triangles[i].vertices[vert].y = scanner.nextFloat();
-                        sector.triangles[i].vertices[vert].z = scanner.nextFloat();
-                        sector.triangles[i].vertices[vert].u = scanner.nextFloat();
-                        sector.triangles[i].vertices[vert].v = scanner.nextFloat();
-                        // System.out.println(sector.triangles[i].vertices[vert]);
-                    }
-                }
-            }
-        } finally {
-            if (in != null)
-                in.close();
-        }
-    }
-
     // ------ Implement methods declared in GLEventListener ------
 
     /*
@@ -177,16 +134,18 @@ public class JOGL2Nehe10World3D implements GLEventListener, KeyListener {
         gl.glShadeModel(GL_SMOOTH); // blends colors nicely, and smoothes out lighting
 
         // Read the world
-        try {
-            setupWorld();
-        } catch (IOException e1) {
-            e1.printStackTrace();
-        }
+        worldMesh = SimpleModelLoader.loadTriangleMesh("models/world.txt");
 
         // Load the texture image
         try {
             // Use URL so that can read from JAR and disk file.
-            BufferedImage image = ImageIO.read(this.getClass().getClassLoader().getResource(TEXTURE_FILENAME));
+            URL textureResource = this.getClass().getClassLoader().getResource(TEXTURE_FILENAME);
+
+            if(textureResource == null) {
+                System.err.println(String.format("Problem loading texture %s", TEXTURE_FILENAME));
+            }
+
+            BufferedImage image = ImageIO.read(textureResource);
 
             // Create a OpenGL Texture object
             textures[0] = AWTTextureIO.newTexture(GLProfile.getDefault(), image, false);
@@ -213,13 +172,10 @@ public class JOGL2Nehe10World3D implements GLEventListener, KeyListener {
             textures[2] = AWTTextureIO.newTexture(GLProfile.getDefault(), image, true); // mipmap is true
             // Use mipmap filter is the image is smaller than the texture
             gl.glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-            gl.glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
-                    GL_LINEAR_MIPMAP_NEAREST);
+            gl.glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_NEAREST);
             gl.glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
             gl.glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-        } catch (GLException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
+        } catch (GLException | IOException e) {
             e.printStackTrace();
         }
 
@@ -297,7 +253,7 @@ public class JOGL2Nehe10World3D implements GLEventListener, KeyListener {
         textures[currTextureFilter].bind(gl);
 
         // Process each triangle
-        for (int i = 0; i < sector.triangles.length; i++) {
+        for (final Triangle triangle : worldMesh.getPolygons()) {
             gl.glBegin(GL_TRIANGLES);
             gl.glNormal3f(0.0f, 0.0f, 1.0f); // Normal pointing out of screen
 
@@ -305,23 +261,23 @@ public class JOGL2Nehe10World3D implements GLEventListener, KeyListener {
             float textureHeight = textureTop - textureBottom;
             float u, v;
 
-            u = sector.triangles[i].vertices[0].u;
-            v = sector.triangles[i].vertices[0].v * textureHeight - textureBottom;
+            u = triangle.getVertices()[0].getU();
+            v = triangle.getVertices()[0].getV() * textureHeight - textureBottom;
             gl.glTexCoord2f(u, v);
-            gl.glVertex3f(sector.triangles[i].vertices[0].x,
-                    sector.triangles[i].vertices[0].y, sector.triangles[i].vertices[0].z);
 
-            u = sector.triangles[i].vertices[1].u;
-            v = sector.triangles[i].vertices[1].v * textureHeight - textureBottom;
-            gl.glTexCoord2f(u, v);
-            gl.glVertex3f(sector.triangles[i].vertices[1].x,
-                    sector.triangles[i].vertices[1].y, sector.triangles[i].vertices[1].z);
+            gl.glVertex3f(triangle.getVertices()[0].getX(), triangle.getVertices()[0].getY(), triangle.getVertices()[0].getZ());
 
-            u = sector.triangles[i].vertices[2].u;
-            v = sector.triangles[i].vertices[2].v * textureHeight - textureBottom;
+            u = triangle.getVertices()[1].getU();
+            v = triangle.getVertices()[1].getV() * textureHeight - textureBottom;
             gl.glTexCoord2f(u, v);
-            gl.glVertex3f(sector.triangles[i].vertices[2].x,
-                    sector.triangles[i].vertices[2].y, sector.triangles[i].vertices[2].z);
+
+            gl.glVertex3f(triangle.getVertices()[1].getX(), triangle.getVertices()[1].getY(), triangle.getVertices()[1].getZ());
+
+            u = triangle.getVertices()[2].getU();
+            v = triangle.getVertices()[2].getV() * textureHeight - textureBottom;
+            gl.glTexCoord2f(u, v);
+
+            gl.glVertex3f(triangle.getVertices()[2].getX(), triangle.getVertices()[2].getY(), triangle.getVertices()[2].getZ());
 
             gl.glEnd();
         }
@@ -391,40 +347,6 @@ public class JOGL2Nehe10World3D implements GLEventListener, KeyListener {
     public void keyTyped(KeyEvent e) {
         switch (e.getKeyChar()) {
 
-        }
-    }
-
-    // A sector comprises many triangles (inner class)
-    class Sector {
-        Triangle[] triangles;
-
-        // Constructor
-        public Sector(int numTriangles) {
-            triangles = new Triangle[numTriangles];
-            for (int i = 0; i < numTriangles; i++) {
-                triangles[i] = new Triangle();
-            }
-        }
-    }
-
-    // A triangle has 3 vertices (inner class)
-    class Triangle {
-        Vertex[] vertices = new Vertex[3];
-
-        public Triangle() {
-            vertices[0] = new Vertex();
-            vertices[1] = new Vertex();
-            vertices[2] = new Vertex();
-        }
-    }
-
-    // A vertex has xyz (location) and uv (for texture) (inner class)
-    class Vertex {
-        float x, y, z; // 3D x,y,z location
-        float u, v; // 2D texture coordinates
-
-        public String toString() {
-            return "(" + x + "," + y + "," + z + ")" + "(" + u + "," + v + ")";
         }
     }
 }

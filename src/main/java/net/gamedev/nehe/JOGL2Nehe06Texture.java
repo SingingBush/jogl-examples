@@ -9,6 +9,10 @@ import com.jogamp.opengl.glu.GLU;
 import com.jogamp.opengl.util.texture.Texture;
 import com.jogamp.opengl.util.texture.TextureCoords;
 import com.jogamp.opengl.util.texture.TextureIO;
+import com.singingbush.core.Quad;
+import com.singingbush.core.PolygonMesh;
+import com.singingbush.loaders.SimpleModelLoader;
+
 import static com.jogamp.opengl.GL.*;  // GL constants
 import static com.jogamp.opengl.GL2.*; // GL2 constants
 
@@ -32,6 +36,8 @@ public class JOGL2Nehe06Texture implements GLEventListener {
     private static float rotateSpeedY = 0.2f;
     private static float rotateSpeedZ = 0.4f;
 
+    private PolygonMesh<Quad> cubeModel; // model
+    
     // Texture
     private Texture texture;
     private static final String TEXTURE_FILE_NAME = "images/nehe.png";
@@ -65,12 +71,19 @@ public class JOGL2Nehe06Texture implements GLEventListener {
         gl.glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST); // best perspective correction
         gl.glShadeModel(GL_SMOOTH); // blends colors nicely, and smoothes out lighting
 
+
+        // Read the world
+        cubeModel = SimpleModelLoader.loadQuadMesh("models/cube.txt");
+        if(cubeModel == null) {
+            System.err.println("Unable to load cube model");
+            System.exit(1);
+        }
+        
         // Load texture from image
         try {
             // Create a OpenGL Texture object from (URL, mipmap, file suffix)
             // Use URL so that can read from JAR and disk file.
-            texture = TextureIO.newTexture(
-                    getClass().getClassLoader().getResource(TEXTURE_FILE_NAME), // relative to project root
+            texture = TextureIO.newTexture(getClass().getClassLoader().getResource(TEXTURE_FILE_NAME), // relative to project root
                     false, TEXTURE_FILE_TYPE);
 
             // Use linear filter for texture if image is larger than the original texture
@@ -85,9 +98,7 @@ public class JOGL2Nehe06Texture implements GLEventListener {
             textureBottom = textureCoords.bottom();
             textureLeft = textureCoords.left();
             textureRight = textureCoords.right();
-        } catch (GLException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
+        } catch (GLException | IOException e) {
             e.printStackTrace();
         }
     }
@@ -137,69 +148,42 @@ public class JOGL2Nehe06Texture implements GLEventListener {
         // Binds this texture to the current GL context.
         texture.bind(gl);  // same as gl.glBindTexture(texture.getTarget(), texture.getTextureObject());
 
-        gl.glBegin(GL_QUADS);
+        // Process each square
+        for (final Quad quad : cubeModel.getPolygons()) {
+            gl.glBegin(GL_QUADS);
+            //gl.glNormal3f(0.0f, 0.0f, 1.0f); // Normal pointing out of screen
 
-        // Front Face
-        gl.glTexCoord2f(textureLeft, textureBottom);
-        gl.glVertex3f(-1.0f, -1.0f, 1.0f); // bottom-left of the texture and quad
-        gl.glTexCoord2f(textureRight, textureBottom);
-        gl.glVertex3f(1.0f, -1.0f, 1.0f);  // bottom-right of the texture and quad
-        gl.glTexCoord2f(textureRight, textureTop);
-        gl.glVertex3f(1.0f, 1.0f, 1.0f);   // top-right of the texture and quad
-        gl.glTexCoord2f(textureLeft, textureTop);
-        gl.glVertex3f(-1.0f, 1.0f, 1.0f);  // top-left of the texture and quad
+            // need to flip the image
+            float textureHeight = textureTop - textureBottom;
+            float u, v;
 
-        // Back Face
-        gl.glTexCoord2f(textureRight, textureBottom);
-        gl.glVertex3f(-1.0f, -1.0f, -1.0f);
-        gl.glTexCoord2f(textureRight, textureTop);
-        gl.glVertex3f(-1.0f, 1.0f, -1.0f);
-        gl.glTexCoord2f(textureLeft, textureTop);
-        gl.glVertex3f(1.0f, 1.0f, -1.0f);
-        gl.glTexCoord2f(textureLeft, textureBottom);
-        gl.glVertex3f(1.0f, -1.0f, -1.0f);
+            u = quad.getVertices()[0].getU();
+            v = quad.getVertices()[0].getV() * textureHeight - textureBottom;
+            gl.glTexCoord2f(u, v);
 
-        // Top Face
-        gl.glTexCoord2f(textureLeft, textureTop);
-        gl.glVertex3f(-1.0f, 1.0f, -1.0f);
-        gl.glTexCoord2f(textureLeft, textureBottom);
-        gl.glVertex3f(-1.0f, 1.0f, 1.0f);
-        gl.glTexCoord2f(textureRight, textureBottom);
-        gl.glVertex3f(1.0f, 1.0f, 1.0f);
-        gl.glTexCoord2f(textureRight, textureTop);
-        gl.glVertex3f(1.0f, 1.0f, -1.0f);
+            gl.glVertex3f(quad.getVertices()[0].getX(), quad.getVertices()[0].getY(), quad.getVertices()[0].getZ());
 
-        // Bottom Face
-        gl.glTexCoord2f(textureRight, textureTop);
-        gl.glVertex3f(-1.0f, -1.0f, -1.0f);
-        gl.glTexCoord2f(textureLeft, textureTop);
-        gl.glVertex3f(1.0f, -1.0f, -1.0f);
-        gl.glTexCoord2f(textureLeft, textureBottom);
-        gl.glVertex3f(1.0f, -1.0f, 1.0f);
-        gl.glTexCoord2f(textureRight, textureBottom);
-        gl.glVertex3f(-1.0f, -1.0f, 1.0f);
+            u = quad.getVertices()[1].getU();
+            v = quad.getVertices()[1].getV() * textureHeight - textureBottom;
+            gl.glTexCoord2f(u, v);
 
-        // Right face
-        gl.glTexCoord2f(textureRight, textureBottom);
-        gl.glVertex3f(1.0f, -1.0f, -1.0f);
-        gl.glTexCoord2f(textureRight, textureTop);
-        gl.glVertex3f(1.0f, 1.0f, -1.0f);
-        gl.glTexCoord2f(textureLeft, textureTop);
-        gl.glVertex3f(1.0f, 1.0f, 1.0f);
-        gl.glTexCoord2f(textureLeft, textureBottom);
-        gl.glVertex3f(1.0f, -1.0f, 1.0f);
+            gl.glVertex3f(quad.getVertices()[1].getX(), quad.getVertices()[1].getY(), quad.getVertices()[1].getZ());
 
-        // Left Face
-        gl.glTexCoord2f(textureLeft, textureBottom);
-        gl.glVertex3f(-1.0f, -1.0f, -1.0f);
-        gl.glTexCoord2f(textureRight, textureBottom);
-        gl.glVertex3f(-1.0f, -1.0f, 1.0f);
-        gl.glTexCoord2f(textureRight, textureTop);
-        gl.glVertex3f(-1.0f, 1.0f, 1.0f);
-        gl.glTexCoord2f(textureLeft, textureTop);
-        gl.glVertex3f(-1.0f, 1.0f, -1.0f);
+            u = quad.getVertices()[2].getU();
+            v = quad.getVertices()[2].getV() * textureHeight - textureBottom;
+            gl.glTexCoord2f(u, v);
 
-        gl.glEnd();
+            gl.glVertex3f(quad.getVertices()[2].getX(), quad.getVertices()[2].getY(), quad.getVertices()[2].getZ());
+
+            u = quad.getVertices()[3].getU();
+            v = quad.getVertices()[3].getV() * textureHeight - textureBottom;
+            gl.glTexCoord2f(u, v);
+
+            gl.glVertex3f(quad.getVertices()[3].getX(), quad.getVertices()[3].getY(), quad.getVertices()[3].getZ());
+
+            gl.glEnd();
+        }
+
 
         // Disables this texture's target (e.g., GL_TEXTURE_2D) in the current GL
         // context's state.

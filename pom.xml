@@ -1,19 +1,19 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-	<modelVersion>4.0.0</modelVersion>
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
 
-	<groupId>com.singingbush</groupId>
-	<artifactId>jogl-examples</artifactId>
-	<version>0.1-SNAPSHOT</version>
-	<packaging>jar</packaging>
+    <groupId>com.singingbush</groupId>
+    <artifactId>jogl-examples</artifactId>
+    <version>0.1-SNAPSHOT</version>
+    <packaging>jar</packaging>
 
-	<name>JOGL Examples</name>
-	<url>http://singingbush.com</url>
+    <name>JOGL Examples</name>
+    <url>http://singingbush.com</url>
 
-	<properties>
-		<jogl.version>2.3.2</jogl.version>
-		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-	</properties>
+    <properties>
+        <jogl.version>2.3.2</jogl.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
 
     <dependencies>
         <dependency>
@@ -24,11 +24,11 @@
         </dependency>
 
         <dependency>
-	    <groupId>org.jogamp.gluegen</groupId>
-	    <artifactId>gluegen-rt-main</artifactId>
-	    <version>${jogl.version}</version>
+            <groupId>org.jogamp.gluegen</groupId>
+            <artifactId>gluegen-rt-main</artifactId>
+            <version>${jogl.version}</version>
             <scope>compile</scope>
-	</dependency>
+        </dependency>
 
         <dependency>
             <groupId>org.jogamp.joal</groupId>
