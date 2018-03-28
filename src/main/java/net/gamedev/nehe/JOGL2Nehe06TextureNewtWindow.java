@@ -20,7 +20,7 @@ public class JOGL2Nehe06TextureNewtWindow {
 
     public static void main(String[] args) {
         // Get the default OpenGL profile, reflecting the best for your running platform
-        GLProfile glp = GLProfile.getDefault();
+        GLProfile glp = GLProfile.get(GLProfile.GL2);
 
         // Specifies a set of OpenGL capabilities, based on your profile.
         GLCapabilities caps = new GLCapabilities(glp);
