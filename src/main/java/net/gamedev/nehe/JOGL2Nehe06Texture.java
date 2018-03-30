@@ -8,10 +8,12 @@ import com.jogamp.opengl.GLException;
 import com.jogamp.opengl.glu.GLU;
 import com.jogamp.opengl.util.texture.Texture;
 import com.jogamp.opengl.util.texture.TextureCoords;
-import com.jogamp.opengl.util.texture.TextureIO;
 import com.singingbush.core.Quad;
 import com.singingbush.core.PolygonMesh;
 import com.singingbush.loaders.SimpleModelLoader;
+import com.singingbush.utils.ResourceLoader;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import static com.jogamp.opengl.GL.*;  // GL constants
 import static com.jogamp.opengl.GL2.*; // GL2 constants
@@ -24,6 +26,7 @@ import static com.jogamp.opengl.GL2.*; // GL2 constants
 @SuppressWarnings("serial")
 public class JOGL2Nehe06Texture implements GLEventListener {
 
+    private static final Logger log = LogManager.getLogger(JOGL2Nehe06Texture.class);
     // Setup OpenGL Graphics Renderer
 
     private GLU glu;  // for the GL Utility
@@ -58,10 +61,10 @@ public class JOGL2Nehe06Texture implements GLEventListener {
     public void init(GLAutoDrawable drawable) {
         GL2 gl = drawable.getGL().getGL2();      // get the OpenGL graphics context
 
-        System.out.println(String.format("GL Implementation: %s", gl.getGLProfile().getImplName()));
-        System.out.println(String.format("GL VENDOR:    %s", gl.glGetString(GL2.GL_VENDOR)));
-        System.out.println(String.format("GL RENDERER:  %s", gl.glGetString(GL2.GL_RENDERER)));
-        System.out.println(String.format("GL VERSION:   %s", gl.glGetString(GL2.GL_VERSION)));
+        log.info(String.format("GL Implementation: %s", gl.getGLProfile().getImplName()));
+        log.info(String.format("GL VENDOR:    %s", gl.glGetString(GL2.GL_VENDOR)));
+        log.info(String.format("GL RENDERER:  %s", gl.glGetString(GL2.GL_RENDERER)));
+        log.info(String.format("GL VERSION:   %s", gl.glGetString(GL2.GL_VERSION)));
 
         glu = new GLU();                         // get GL Utilities
         gl.glClearColor(0.0f, 0.0f, 0.0f, 0.0f); // set background (clear) color
@@ -83,8 +86,7 @@ public class JOGL2Nehe06Texture implements GLEventListener {
         try {
             // Create a OpenGL Texture object from (URL, mipmap, file suffix)
             // Use URL so that can read from JAR and disk file.
-            texture = TextureIO.newTexture(getClass().getClassLoader().getResource(TEXTURE_FILE_NAME), // relative to project root
-                    false, TEXTURE_FILE_TYPE);
+            texture = ResourceLoader.loadTextureResource(TEXTURE_FILE_NAME, false);
 
             // Use linear filter for texture if image is larger than the original texture
             gl.glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
