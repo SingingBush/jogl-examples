@@ -13,6 +13,8 @@
     <properties>
         <jogl.version>2.3.2</jogl.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
     </properties>
 
     <dependencies>
@@ -70,10 +72,20 @@
         <finalName>${project.artifactId}-${project.version}</finalName>
 
         <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.7.0</version>
+            </plugin>
+
             <plugin>   <!-- run "mvn javadoc:jar" to build the javadocs -->
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
-                <version>2.10.1</version>
+                <version>3.0.0</version>
+                <configuration>
+                    <doclint>none</doclint>
+                    <!-- TODO: fix the problems with Javadoc comments -->
+                </configuration>
                 <executions>
                     <execution>
                         <id>attach-javadocs</id>
@@ -84,15 +96,10 @@
                 </executions>
             </plugin>
 
-            <!-- Java compiler version -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.2</version>
-                <configuration>
-                    <source>1.8</source>
-                    <target>1.8</target>
-                </configuration>
+                <artifactId>maven-source-plugin</artifactId>
+                <version>3.0.1</version>
             </plugin>
         </plugins>
     </build>
