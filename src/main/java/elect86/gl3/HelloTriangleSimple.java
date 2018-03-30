@@ -11,6 +11,7 @@ import com.jogamp.opengl.util.Animator;
 import com.jogamp.opengl.util.GLBuffers;
 import com.jogamp.opengl.util.glsl.ShaderCode;
 import com.jogamp.opengl.util.glsl.ShaderProgram;
+import com.singingbush.utils.ResourceLoader;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -123,7 +124,6 @@ public class HelloTriangleSimple implements GLEventListener, KeyListener {
     }
 
     private void initBuffers(GL3 gl) {
-
         FloatBuffer vertexBuffer = GLBuffers.newDirectFloatBuffer(vertexData);
         ShortBuffer elementBuffer = GLBuffers.newDirectShortBuffer(elementData);
 
@@ -148,7 +148,6 @@ public class HelloTriangleSimple implements GLEventListener, KeyListener {
     }
 
     private void initVertexArray(GL3 gl) {
-
         gl.glGenVertexArrays(1, vertexArrayName);
         gl.glBindVertexArray(vertexArrayName.get(0));
         {
@@ -174,15 +173,13 @@ public class HelloTriangleSimple implements GLEventListener, KeyListener {
     }
 
     private void initProgram(GL3 gl) {
-
-        program = new Program(gl, getClass(), "shaders/gl3", "hello-triangle", "hello-triangle");
+        program = new Program(gl);
 
         checkError(gl, "initProgram");
     }
 
     @Override
     public void display(GLAutoDrawable drawable) {
-
         GL3 gl = drawable.getGL().getGL3();
 
         // view matrix
@@ -229,7 +226,6 @@ public class HelloTriangleSimple implements GLEventListener, KeyListener {
 
     @Override
     public void reshape(GLAutoDrawable drawable, int x, int y, int width, int height) {
-
         GL3 gl = drawable.getGL().getGL3();
 
         float[] ortho = new float[16];
@@ -246,7 +242,6 @@ public class HelloTriangleSimple implements GLEventListener, KeyListener {
 
     @Override
     public void dispose(GLAutoDrawable drawable) {
-
         GL3 gl = drawable.getGL().getGL3();
 
         gl.glDeleteProgram(program.name);
@@ -272,36 +267,30 @@ public class HelloTriangleSimple implements GLEventListener, KeyListener {
 
         int name, modelToWorldMatUL;
 
-        Program(GL3 gl, Class context, String root, String vertex, String fragment) {
+        Program(GL3 gl) {
+            ShaderCode vertShader = ResourceLoader.vertexShader(gl, "shaders/gl3/hello-triangle", "vert");
+            ShaderCode fragShader = ResourceLoader.fragmentShader(gl, "shaders/gl3/hello-triangle", "frag");
 
-            ShaderCode vertShader = ShaderCode.create(gl, GL_VERTEX_SHADER, this.getClass(), root, null, vertex,
-                    "vert", null, true);
-            ShaderCode fragShader = ShaderCode.create(gl, GL_FRAGMENT_SHADER, this.getClass(), root, null, fragment,
-                    "frag", null, true);
-
-            ShaderProgram shaderProgram = new ShaderProgram();
-
+            final ShaderProgram shaderProgram = new ShaderProgram();
             shaderProgram.add(vertShader);
             shaderProgram.add(fragShader);
-
             shaderProgram.init(gl);
 
             name = shaderProgram.program();
 
             shaderProgram.link(gl, System.err);
 
-
             modelToWorldMatUL = gl.glGetUniformLocation(name, "model");
 
             if (modelToWorldMatUL == -1) {
-                System.err.println("uniform 'model' not found!");
+                log.error("uniform 'model' not found!");
             }
 
 
             int globalMatricesBI = gl.glGetUniformBlockIndex(name, "GlobalMatrices");
 
             if (globalMatricesBI == -1) {
-                System.err.println("block index 'GlobalMatrices' not found!");
+                log.error("block index 'GlobalMatrices' not found!");
             }
             gl.glUniformBlockBinding(name, globalMatricesBI, Uniform.GLOBAL_MATRICES);
         }
