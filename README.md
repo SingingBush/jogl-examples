@@ -8,6 +8,7 @@ In my quest to learn about OpenGL I've come across tons of examples, most of the
  * Use Maven to handle dependencies to ensure that the examples compile with the latest JOGL libs
  * Prefer NEWT over Swing/AWT
  * Use the most recent GL Profile available to Linux, Windows and Mac (Mac OS X support being the hold up)
+ * Over time replace all GL2 examples with GL3/GL4 equivalent.
  * Keep the code readable (see Clean Code by Robert C. Martin)
 
  > Even on OSX Mavericks (in which GLview states 4.1 is available) GL 2.1 is the latest profile available in JOGL
