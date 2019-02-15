@@ -22,14 +22,14 @@
         <dependency>
             <groupId>org.jetbrains</groupId>
             <artifactId>annotations</artifactId>
-            <version>15.0</version>
+            <version>17.0.0</version>
             <scope>compile</scope>
         </dependency>
 
         <dependency>
             <groupId>org.apache.logging.log4j</groupId>
             <artifactId>log4j-core</artifactId>
-            <version>2.9.1</version>
+            <version>2.11.2</version>
             <scope>compile</scope>
         </dependency>
 
@@ -81,7 +81,7 @@
             <plugin>   <!-- run "mvn javadoc:jar" to build the javadocs -->
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
-                <version>3.0.0</version>
+                <version>3.0.1</version>
                 <configuration>
                     <doclint>none</doclint>
                     <!-- TODO: fix the problems with Javadoc comments -->
