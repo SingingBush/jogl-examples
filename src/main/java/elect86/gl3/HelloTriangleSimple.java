@@ -9,9 +9,7 @@ import com.jogamp.opengl.*;
 import com.jogamp.opengl.math.FloatUtil;
 import com.jogamp.opengl.util.Animator;
 import com.jogamp.opengl.util.GLBuffers;
-import com.jogamp.opengl.util.glsl.ShaderCode;
-import com.jogamp.opengl.util.glsl.ShaderProgram;
-import com.singingbush.utils.ResourceLoader;
+import com.singingbush.utils.GLUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -24,15 +22,13 @@ import static com.jogamp.opengl.GL.GL_STATIC_DRAW;
 import static com.jogamp.opengl.GL.GL_TRIANGLES;
 import static com.jogamp.opengl.GL.GL_UNSIGNED_SHORT;
 import static com.jogamp.opengl.GL3.GL_ARRAY_BUFFER;
-import static com.jogamp.opengl.GL3.*;
+import static com.jogamp.opengl.GL3.GL_COLOR;
+import static com.jogamp.opengl.GL3.GL_DEPTH;
 import static com.jogamp.opengl.GL3.GL_DEPTH_TEST;
 import static com.jogamp.opengl.GL3.GL_FLOAT;
-import static com.jogamp.opengl.GL3.GL_INVALID_ENUM;
-import static com.jogamp.opengl.GL3.GL_INVALID_FRAMEBUFFER_OPERATION;
-import static com.jogamp.opengl.GL3.GL_INVALID_OPERATION;
-import static com.jogamp.opengl.GL3.GL_INVALID_VALUE;
 import static com.jogamp.opengl.GL3.GL_NO_ERROR;
-import static com.jogamp.opengl.GL3.GL_OUT_OF_MEMORY;
+import static com.jogamp.opengl.GL3.GL_STREAM_DRAW;
+import static com.jogamp.opengl.GL3.GL_UNIFORM_BUFFER;
 
 /**
  * @author gbarbieri
@@ -46,7 +42,7 @@ public class HelloTriangleSimple implements GLEventListener, KeyListener {
     private static Animator animator;
 
     public static void main(String[] args) {
-        new HelloTriangleSimple().setup();
+        new HelloTriangleSimple().run();
     }
 
     private float[] vertexData = {
@@ -72,11 +68,11 @@ public class HelloTriangleSimple implements GLEventListener, KeyListener {
 
     private FloatBuffer matBuffer = GLBuffers.newDirectFloatBuffer(16);
 
-    private Program program;
+    private TriangleProgram program;
 
     private long start;
 
-    private void setup() {
+    private void run() {
         try {
             GLProfile glProfile = GLProfile.get(GLProfile.GL3);
             GLCapabilities glCapabilities = new GLCapabilities(glProfile);
@@ -109,23 +105,22 @@ public class HelloTriangleSimple implements GLEventListener, KeyListener {
 
     @Override
     public void init(GLAutoDrawable drawable) {
-
         GL3 gl = drawable.getGL().getGL3();
 
         initBuffers(gl);
 
         initVertexArray(gl);
 
-        initProgram(gl);
+        program = new TriangleProgram(gl);
 
         gl.glEnable(GL_DEPTH_TEST);
 
         start = System.currentTimeMillis();
     }
 
-    private void initBuffers(GL3 gl) {
-        FloatBuffer vertexBuffer = GLBuffers.newDirectFloatBuffer(vertexData);
-        ShortBuffer elementBuffer = GLBuffers.newDirectShortBuffer(elementData);
+    private void initBuffers(final GL3 gl) {
+        final FloatBuffer vertexBuffer = GLBuffers.newDirectFloatBuffer(vertexData);
+        final ShortBuffer elementBuffer = GLBuffers.newDirectShortBuffer(elementData);
 
         gl.glGenBuffers(Buffer.MAX, bufferName);
 
@@ -144,10 +139,15 @@ public class HelloTriangleSimple implements GLEventListener, KeyListener {
 
         gl.glBindBufferBase(GL_UNIFORM_BUFFER, Uniform.GLOBAL_MATRICES, bufferName.get(Buffer.GLOBAL_MATRICES));
 
-        checkError(gl, "initBuffers");
+        int error = gl.glGetError();
+        if (error != GL_NO_ERROR) {
+            final String message = String.format("OpenGL error whilst initialising buffers: %s", GLUtils.errorCodeToString(error));
+            log.fatal(message);
+            throw new GLException(message);
+        }
     }
 
-    private void initVertexArray(GL3 gl) {
+    private void initVertexArray(final GL3 gl) {
         gl.glGenVertexArrays(1, vertexArrayName);
         gl.glBindVertexArray(vertexArrayName.get(0));
         {
@@ -169,13 +169,12 @@ public class HelloTriangleSimple implements GLEventListener, KeyListener {
         }
         gl.glBindVertexArray(0);
 
-        checkError(gl, "initVao");
-    }
-
-    private void initProgram(GL3 gl) {
-        program = new Program(gl);
-
-        checkError(gl, "initProgram");
+        int error = gl.glGetError();
+        if (error != GL_NO_ERROR) {
+            final String message = String.format("OpenGL error whilst initialising vertex arrays: %s", GLUtils.errorCodeToString(error));
+            log.fatal(message);
+            throw new GLException(message);
+        }
     }
 
     @Override
@@ -198,7 +197,7 @@ public class HelloTriangleSimple implements GLEventListener, KeyListener {
         gl.glClearBufferfv(GL_COLOR, 0, clearColor.put(0, 0f).put(1, .33f).put(2, 0.66f).put(3, 1f));
         gl.glClearBufferfv(GL_DEPTH, 0, clearDepth.put(0, 1f));
 
-        gl.glUseProgram(program.name);
+        gl.glUseProgram(program.getName());
         gl.glBindVertexArray(vertexArrayName.get(0));
 
         // model matrix
@@ -213,7 +212,7 @@ public class HelloTriangleSimple implements GLEventListener, KeyListener {
             for (int i = 0; i < 16; i++) {
                 matBuffer.put(i, modelToWorldMat[i]);
             }
-            gl.glUniformMatrix4fv(program.modelToWorldMatUL, 1, false, matBuffer);
+            gl.glUniformMatrix4fv(program.getModelToWorldMatUL(), 1, false, matBuffer);
         }
 
         gl.glDrawElements(GL_TRIANGLES, elementData.length, GL_UNSIGNED_SHORT, 0);
@@ -221,7 +220,12 @@ public class HelloTriangleSimple implements GLEventListener, KeyListener {
         gl.glUseProgram(0);
         gl.glBindVertexArray(0);
 
-        checkError(gl, "display");
+        int error = gl.glGetError();
+        if (error != GL_NO_ERROR) {
+            final String message = String.format("OpenGL error: %s", GLUtils.errorCodeToString(error));
+            log.fatal(message);
+            throw new GLException(message);
+        }
     }
 
     @Override
@@ -242,9 +246,9 @@ public class HelloTriangleSimple implements GLEventListener, KeyListener {
 
     @Override
     public void dispose(GLAutoDrawable drawable) {
-        GL3 gl = drawable.getGL().getGL3();
+        final GL3 gl = drawable.getGL().getGL3();
 
-        gl.glDeleteProgram(program.name);
+        gl.glDeleteProgram(program.getName());
         gl.glDeleteVertexArrays(1, vertexArrayName);
         gl.glDeleteBuffers(Buffer.MAX, bufferName);
     }
@@ -252,77 +256,18 @@ public class HelloTriangleSimple implements GLEventListener, KeyListener {
 
     @Override
     public void keyPressed(KeyEvent e) {
-        if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
-            new Thread(() -> {
-                window.destroy();
-            }).start();
+        switch (e.getKeyCode()) {
+            case KeyEvent.VK_SPACE:
+                log.info("todo"); // todo: pause the rotation when key pressed
+                break;
+            case KeyEvent.VK_ESCAPE:
+                new Thread(() -> window.destroy()).start();
+                break;
         }
     }
 
     @Override
     public void keyReleased(KeyEvent e) {
-    }
-
-    private class Program {
-
-        int name, modelToWorldMatUL;
-
-        Program(GL3 gl) {
-            ShaderCode vertShader = ResourceLoader.vertexShader(gl, "shaders/gl3/hello-triangle", "vert");
-            ShaderCode fragShader = ResourceLoader.fragmentShader(gl, "shaders/gl3/hello-triangle", "frag");
-
-            final ShaderProgram shaderProgram = new ShaderProgram();
-            shaderProgram.add(vertShader);
-            shaderProgram.add(fragShader);
-            shaderProgram.init(gl);
-
-            name = shaderProgram.program();
-
-            shaderProgram.link(gl, System.err);
-
-            modelToWorldMatUL = gl.glGetUniformLocation(name, "model");
-
-            if (modelToWorldMatUL == -1) {
-                log.error("uniform 'model' not found!");
-            }
-
-
-            int globalMatricesBI = gl.glGetUniformBlockIndex(name, "GlobalMatrices");
-
-            if (globalMatricesBI == -1) {
-                log.error("block index 'GlobalMatrices' not found!");
-            }
-            gl.glUniformBlockBinding(name, globalMatricesBI, Uniform.GLOBAL_MATRICES);
-        }
-    }
-
-    private void checkError(GL gl, String location) {
-
-        int error = gl.glGetError();
-        if (error != GL_NO_ERROR) {
-            String errorString;
-            switch (error) {
-                case GL_INVALID_ENUM:
-                    errorString = "GL_INVALID_ENUM";
-                    break;
-                case GL_INVALID_VALUE:
-                    errorString = "GL_INVALID_VALUE";
-                    break;
-                case GL_INVALID_OPERATION:
-                    errorString = "GL_INVALID_OPERATION";
-                    break;
-                case GL_INVALID_FRAMEBUFFER_OPERATION:
-                    errorString = "GL_INVALID_FRAMEBUFFER_OPERATION";
-                    break;
-                case GL_OUT_OF_MEMORY:
-                    errorString = "GL_OUT_OF_MEMORY";
-                    break;
-                default:
-                    errorString = "UNKNOWN";
-                    break;
-            }
-            throw new Error("OpenGL Error(" + errorString + "): " + location);
-        }
     }
 
     private interface Attr {
