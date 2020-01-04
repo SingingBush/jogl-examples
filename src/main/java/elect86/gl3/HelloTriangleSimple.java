@@ -105,7 +105,12 @@ public class HelloTriangleSimple implements GLEventListener, KeyListener {
 
     @Override
     public void init(GLAutoDrawable drawable) {
-        GL3 gl = drawable.getGL().getGL3();
+        final GL3 gl = drawable.getGL().getGL3();
+
+        System.out.println(String.format("GL Implementation: %s", gl.getGLProfile().getImplName()));
+        System.out.println(String.format("GL VERSION:   %s", gl.glGetString(gl.GL_VERSION)));
+        System.out.println(String.format("GL VENDOR:    %s", gl.glGetString(gl.GL_VENDOR)));
+        System.out.println(String.format("GL RENDERER:  %s", gl.glGetString(gl.GL_RENDERER)));
 
         initBuffers(gl);
 
