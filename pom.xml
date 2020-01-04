@@ -49,7 +49,7 @@
         <dependency>
             <groupId>com.github.kotlin-graphics</groupId>
             <artifactId>glm</artifactId>
-            <version>0.01</version>
+            <version>0.10</version>
             <scope>compile</scope>
         </dependency>
 
