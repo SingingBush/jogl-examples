@@ -42,6 +42,13 @@ public class HelloTriangleSimple implements GLEventListener, KeyListener {
     private static Animator animator;
 
     public static void main(String[] args) {
+        GLProfile.initSingleton();
+
+        if(!GLProfile.isAvailable(GLProfile.GL3)) {
+            log.error("Cannot run without OpenGL 3");
+            System.exit(1);
+        }
+
         new HelloTriangleSimple().run();
     }
 
@@ -74,7 +81,13 @@ public class HelloTriangleSimple implements GLEventListener, KeyListener {
 
     private void run() {
         try {
-            GLProfile glProfile = GLProfile.get(GLProfile.GL3);
+            GLProfile glProfile = GLProfile.getMaxProgrammableCore(true); // GLProfile.get(GLProfile.GL3);
+
+            if(!glProfile.isGL3()) {
+                log.error("Was unable to get OpenGL 3 profile");
+                System.exit(1);
+            }
+
             GLCapabilities glCapabilities = new GLCapabilities(glProfile);
 
             window = GLWindow.create(glCapabilities);
