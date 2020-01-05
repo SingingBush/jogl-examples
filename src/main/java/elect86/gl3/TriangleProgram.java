@@ -28,11 +28,23 @@ public class TriangleProgram {
     private final int name, modelToWorldMatUL;
 
     TriangleProgram(GL3 gl) {
-        final ShaderCode vertShader = ResourceLoader
-            .vertexShader(gl, "shaders/gl3/hello-triangle", "vert");
+//        final ShaderCode vertShader = ResourceLoader
+//            .vertexShader(gl, "shaders/gl3/hello-triangle", "vert");
+        final ShaderCode vertShader = ResourceLoader.shader()
+            .withProfile(gl)
+            .withPath("shaders/gl3")
+            .withFilename("hello-triangle")
+            .withExtension("vert")
+            .buildVertexShader();
 
-        final ShaderCode fragShader = ResourceLoader.
-            fragmentShader(gl, "shaders/gl3/hello-triangle", "frag");
+//        final ShaderCode fragShader = ResourceLoader.
+//            fragmentShader(gl, "shaders/gl3/hello-triangle", "frag");
+        final ShaderCode fragShader = ResourceLoader.shader()
+            .withProfile(gl)
+            .withPath("shaders/gl3")
+            .withFilename("hello-triangle")
+            .withExtension("frag")
+            .buildFragmentShader();
 
         final ShaderProgram shaderProgram = new ShaderProgram();
         shaderProgram.add(vertShader);
