@@ -84,7 +84,7 @@
             <plugin>   <!-- run "mvn javadoc:jar" to build the javadocs -->
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
-                <version>3.2.0</version>
+                <version>3.3.0</version>
                 <configuration>
                     <doclint>none</doclint>
                     <!-- TODO: fix the problems with Javadoc comments -->
