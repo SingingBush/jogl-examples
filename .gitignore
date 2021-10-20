@@ -1,3 +1,10 @@
+# Ignore VS Code related files
+.classpath
+.factorypath
+.project
+.settings/
+
+# Ignore Intellij related files
 .idea
 *.iml
 target/

@@ -1,6 +1,8 @@
 JOGL Examples
 =============
 
+![Java CI](https://github.com/SingingBush/jogl-examples/workflows/Java%20CI/badge.svg)
+
 ### and related modules, eg: JOAL & JOCL ###
 
 In my quest to learn about OpenGL I've come across tons of examples, most of them out-dated. This seems to be the case for a lot of the JOGL examples I've found. This repo has been setup with the following goals in mind:
