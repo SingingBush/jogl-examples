@@ -1,10 +1,14 @@
-# Ignore VS Code related files
+.DS_Store
+target/
+
+### Ignore VS Code (Java Plugin) files ###
 .classpath
-.factorypath
 .project
 .settings/
+.vscode/
 
-# Ignore Intellij related files
+### Ignore Intellij IDEA specific files ###
 .idea
+*.iws
 *.iml
-target/
+*.ipr
