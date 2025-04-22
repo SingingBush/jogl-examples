@@ -1,6 +1,16 @@
 name: Java CI
 
-on: [push, pull_request]
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - master # todo: rename to main
+      - main
+  pull_request:
+    types: [opened, reopened, synchronize]
+    branches:
+      - master # todo: rename to main
+      - main
 
 jobs:
   build:
