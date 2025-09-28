@@ -11,6 +11,7 @@ import com.jogamp.opengl.util.Animator;
 import com.jogamp.opengl.util.GLBuffers;
 import com.jogamp.opengl.util.glsl.ShaderCode;
 import com.jogamp.opengl.util.glsl.ShaderProgram;
+import com.singingbush.utils.OldJoglFloatUtil;
 import com.singingbush.utils.ResourceLoader;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -207,7 +208,7 @@ public class HelloTriangleSimple implements GLEventListener, KeyListener {
             float diff = (float) (now - start) / 1_000f;
 
             float[] scale = FloatUtil.makeScale(new float[16], true, 0.5f, 0.5f, 0.5f);
-            float[] zRotation = FloatUtil.makeRotationEuler(new float[16], 0, 0, 0, diff);
+            float[] zRotation = OldJoglFloatUtil.makeRotationEuler(new float[16], 0, 0, 0, diff);
             float[] modelToWorldMat = FloatUtil.multMatrix(scale, zRotation);
 
             for (int i = 0; i < 16; i++) {
@@ -229,7 +230,7 @@ public class HelloTriangleSimple implements GLEventListener, KeyListener {
         GL3 gl = drawable.getGL().getGL3();
 
         float[] ortho = new float[16];
-        FloatUtil.makeOrtho(ortho, 0, false, -1, 1, -1, 1, 1, -1);
+        OldJoglFloatUtil.makeOrtho(ortho, 0, false, -1, 1, -1, 1, 1, -1);
         for (int i = 0; i < 16; i++) {
             matBuffer.put(i, ortho[i]);
         }

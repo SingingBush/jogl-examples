@@ -17,15 +17,23 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
-        <jogl.version>2.3.2</jogl.version>
+        <jogl.version>2.4.0</jogl.version>
     </properties>
+
+    <!-- Because the jogl devs can't seem to publish to maven central -->
+    <repositories>
+        <repository>
+            <id>jogamp</id>
+            <url>https://jogamp.org/deployment/maven</url>
+        </repository>
+    </repositories>
 
     <dependencies>
 
         <dependency>
             <groupId>org.jetbrains</groupId>
             <artifactId>annotations</artifactId>
-            <version>26.0.2</version>
+            <version>26.0.2-1</version>
             <scope>compile</scope>
         </dependency>
 
@@ -92,7 +100,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>3.5.3</version>
+                <version>3.5.4</version>
                 <!-- No unit tests but for some reason Maven was failing to find default plugins -->
             </plugin>
 
