@@ -8,6 +8,7 @@ import com.jogamp.opengl.util.Animator;
 import com.jogamp.opengl.util.GLBuffers;
 import com.jogamp.opengl.util.glsl.ShaderCode;
 import com.jogamp.opengl.util.glsl.ShaderProgram;
+import com.singingbush.utils.OldJoglFloatUtil;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -54,7 +55,7 @@ public class HelloTriangleSimple implements GLEventListener, KeyListener {
         int PER_PASS = 2;
         int LIGHT = 3;
     }
-    
+
     private interface Stream {
         int A = 0;
         int B = 1;
@@ -280,7 +281,7 @@ public class HelloTriangleSimple implements GLEventListener, KeyListener {
             float diff = (float) (now - start) / 1_000;
 
             float[] scale = FloatUtil.makeScale(new float[16], true, 0.5f, 0.5f, 0.5f);
-            float[] rotateZ = FloatUtil.makeRotationAxis(new float[16], 0, diff, 0f, 0f, 1f, new float[3]);
+            float[] rotateZ = OldJoglFloatUtil.makeRotationAxis(new float[16], 0, diff, 0f, 0f, 1f, new float[3]);
             float[] model = FloatUtil.multMatrix(scale, rotateZ);
             modelMatrixPointer.asFloatBuffer().put(model);
         }
@@ -314,7 +315,7 @@ public class HelloTriangleSimple implements GLEventListener, KeyListener {
         GL4 gl = drawable.getGL().getGL4();
 
         // ortho matrix
-        float[] ortho = FloatUtil.makeOrtho(new float[16], 0, false, -1f, 1f, -1f, 1f, 1f, -1f);
+        float[] ortho = OldJoglFloatUtil.makeOrtho(new float[16], 0, false, -1f, 1f, -1f, 1f, 1f, -1f);
         globalMatricesPointer.asFloatBuffer().put(ortho);
 
         gl.glViewport(x, y, width, height);
