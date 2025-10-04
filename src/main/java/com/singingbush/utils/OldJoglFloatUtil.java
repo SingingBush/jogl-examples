@@ -4,7 +4,6 @@ import com.jogamp.common.os.Platform;
 import com.jogamp.opengl.GLException;
 import com.jogamp.opengl.math.FovHVHalves;
 import com.jogamp.opengl.math.Ray;
-import com.jogamp.opengl.math.VectorUtil;
 import jogamp.opengl.Debug;
 
 import java.nio.FloatBuffer;
@@ -16,7 +15,7 @@ import java.nio.FloatBuffer;
 *
 * There is a similar situation with VectorUtil from 2.5.0
 */
-public class OldJoglFloatUtil {
+public final class OldJoglFloatUtil {
     public static final boolean DEBUG = Debug.debug("Math");
     private static volatile boolean machEpsilonAvail = false;
     private static float machEpsilon = 0.0F;
@@ -141,7 +140,7 @@ public class OldJoglFloatUtil {
         var6[0] = var3;
         var6[1] = var4;
         var6[2] = var5;
-        VectorUtil.normalizeVec3(var6);
+        OldJoglVectorUtil.normalizeVec3(var6);
         var3 = var6[0];
         var4 = var6[1];
         var5 = var6[2];
@@ -285,10 +284,10 @@ public class OldJoglFloatUtil {
         var8[0] = var4[0 + var5] - var2[0 + var3];
         var8[1] = var4[1 + var5] - var2[1 + var3];
         var8[2] = var4[2 + var5] - var2[2 + var3];
-        VectorUtil.normalizeVec3(var8);
-        VectorUtil.crossVec3(var8, 3, var8, 0, var6, var7);
-        VectorUtil.normalizeVec3(var8, 3);
-        VectorUtil.crossVec3(var8, 6, var8, 3, var8, 0);
+        OldJoglVectorUtil.normalizeVec3(var8);
+        OldJoglVectorUtil.crossVec3(var8, 3, var8, 0, var6, var7);
+        OldJoglVectorUtil.normalizeVec3(var8, 3);
+        OldJoglVectorUtil.crossVec3(var8, 6, var8, 3, var8, 0);
         var0[var1 + 0 + 0] = var8[3];
         var0[var1 + 0 + 1] = var8[6];
         var0[var1 + 0 + 2] = -var8[0];
@@ -713,8 +712,8 @@ public class OldJoglFloatUtil {
         multMatrix(var6, var7, var4, var5, var11, 0);
         if (null == invertMatrix(var11, var11)) {
             return false;
-        } else if (mapWinToObjCoords(var0, var1, var2, var3, var11, var8, var9, var10.orig, 0, var10.dir, 0, var12, var13)) {
-            VectorUtil.normalizeVec3(VectorUtil.subVec3(var10.dir, var10.dir, var10.orig));
+        } else if (mapWinToObjCoords(var0, var1, var2, var3, var11, var8, var9, var10.orig.get(new float[] {}), 0, var10.dir.get(new float[] {}), 0, var12, var13)) {
+            (var10.dir.minus(var10.dir, var10.orig)).normalize();
             return true;
         } else {
             return false;
