@@ -1,7 +1,7 @@
 JOGL Examples
 =============
 
-![Java CI](https://github.com/SingingBush/jogl-examples/workflows/Java%20CI/badge.svg)
+[![Java CI](https://github.com/SingingBush/jogl-examples/actions/workflows/maven.yml/badge.svg)](https://github.com/SingingBush/jogl-examples/actions/workflows/maven.yml)
 
 ### and related modules, eg: JOAL & JOCL ###
 

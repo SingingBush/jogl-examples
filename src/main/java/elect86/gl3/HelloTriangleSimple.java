@@ -1,17 +1,17 @@
 package elect86.gl3;
 
+import com.jogamp.math.Matrix4f;
 import com.jogamp.newt.event.KeyEvent;
 import com.jogamp.newt.event.KeyListener;
 import com.jogamp.newt.event.WindowAdapter;
 import com.jogamp.newt.event.WindowEvent;
 import com.jogamp.newt.opengl.GLWindow;
 import com.jogamp.opengl.*;
-import com.jogamp.opengl.math.FloatUtil;
+import com.jogamp.math.FloatUtil;
 import com.jogamp.opengl.util.Animator;
 import com.jogamp.opengl.util.GLBuffers;
 import com.jogamp.opengl.util.glsl.ShaderCode;
 import com.jogamp.opengl.util.glsl.ShaderProgram;
-import com.singingbush.utils.OldJoglFloatUtil;
 import com.singingbush.utils.ResourceLoader;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -208,7 +208,8 @@ public class HelloTriangleSimple implements GLEventListener, KeyListener {
             float diff = (float) (now - start) / 1_000f;
 
             float[] scale = FloatUtil.makeScale(new float[16], true, 0.5f, 0.5f, 0.5f);
-            float[] zRotation = OldJoglFloatUtil.makeRotationEuler(new float[16], 0, 0, 0, diff);
+            final Matrix4f m4f = new Matrix4f(new float[16], 0);
+            float[] zRotation = m4f.setToRotationEuler(0, 0, diff).get(new float[16]);
             float[] modelToWorldMat = FloatUtil.multMatrix(scale, zRotation);
 
             for (int i = 0; i < 16; i++) {
@@ -229,8 +230,9 @@ public class HelloTriangleSimple implements GLEventListener, KeyListener {
     public void reshape(GLAutoDrawable drawable, int x, int y, int width, int height) {
         GL3 gl = drawable.getGL().getGL3();
 
-        float[] ortho = new float[16];
-        OldJoglFloatUtil.makeOrtho(ortho, 0, false, -1, 1, -1, 1, 1, -1);
+        final Matrix4f m4f = new Matrix4f(new float[16], 0);
+        float[] ortho = m4f.setToOrtho(-1f, 1f, -1f, 1f, 1f, -1f).get(new float[16]);
+
         for (int i = 0; i < 16; i++) {
             matBuffer.put(i, ortho[i]);
         }

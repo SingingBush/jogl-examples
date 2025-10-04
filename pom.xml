@@ -17,10 +17,12 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
-        <jogl.version>2.5.0</jogl.version>
+        <jogl.version>2.6.0</jogl.version>
         <!--
-        Jogl 2.6.0 removes the math package entirely so will require a lot of changes due to:
-        "Decouple math functionality to 'com.jogamp.math' to be toolkit agnostic"
+        In Jogl 2.6.0 the 'com.jogamp.opengl.math' package has been relocated to 'com.jogamp.math' and many
+        methods have been removed entirely. There's a lot of breaking changes in the API so some care is needed
+        to ensure the examples continue to work as expected.
+        The related ticket is: "Decouple math functionality to 'com.jogamp.math' to be toolkit agnostic"
         see: https://jogamp.org/bugzilla//show_bug.cgi?id=1452
         -->
     </properties>
